@@ -1,0 +1,37 @@
+buildscript {
+    ext {
+        scala_version = '2.11.12'
+        spark_version = '2.2.2'
+    }
+}
+
+plugins {
+    id 'scala'
+}
+
+group 'sarda'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly (
+            // scala
+            "org.scala-lang:scala-compiler:${scala_version}",
+            // spark
+            "org.apache.spark:spark-core_2.11:${spark_version}"
+    )
+    compile (
+            // scala
+            "org.scala-lang:scala-library:${scala_version}",
+            // spark
+            "org.apache.spark:spark-sql_2.11:${spark_version}",
+            "org.apache.spark:spark-mllib_2.11:${spark_version}"
+    )
+    testCompile (
+            "junit:junit:4.12",
+            "org.scalatest:scalatest_2.11:3.0.5"
+    )
+}
