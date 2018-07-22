@@ -3,35 +3,47 @@ buildscript {
         scala_version = '2.11.12'
         spark_version = '2.2.2'
     }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    }
 }
 
 plugins {
+    id 'application' // support mainClassName
     id 'scala'
+    id 'com.github.johnrengelman.shadow' version '2.0.4' // add shadowJar task
 }
 
 group 'sarda'
 version '1.0-SNAPSHOT'
+
+mainClassName = 'hello.spark.Main'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    // excluded from shadowJar
     compileOnly (
-            // scala
-            "org.scala-lang:scala-compiler:${scala_version}",
             // spark
-            "org.apache.spark:spark-core_2.11:${spark_version}"
-    )
-    compile (
-            // scala
-            "org.scala-lang:scala-library:${scala_version}",
-            // spark
+            "org.apache.spark:spark-core_2.11:${spark_version}",
             "org.apache.spark:spark-sql_2.11:${spark_version}",
             "org.apache.spark:spark-mllib_2.11:${spark_version}"
     )
-    testCompile (
+    // *implementation, so bundled into (test) jar
+    testImplementation (
             "junit:junit:4.12",
-            "org.scalatest:scalatest_2.11:3.0.5"
+            "org.scalatest:scalatest_2.11:3.0.5",
+            // spark again, so that local tests can be executed from IntelliJ
+            "org.apache.spark:spark-core_2.11:${spark_version}",
+            "org.apache.spark:spark-sql_2.11:${spark_version}",
+            "org.apache.spark:spark-mllib_2.11:${spark_version}"
     )
 }
+
+// shadowJar task creates a jar in build/libs that can be executed with:
+// spark-submit --master local[1] --files ../../spark-warehouse/questions_10K.csv,../../spark-warehouse/question_tags_10K.csv hello-spark-gradle-1.0-SNAPSHOT-all.jar

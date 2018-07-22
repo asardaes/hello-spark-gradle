@@ -4,10 +4,9 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
 trait Context {
+  // since this is lazy, .setMaster can be called in test, but left alone for spark-submit
   lazy val sparkConf: SparkConf = new SparkConf()
     .setAppName("Hello Spark")
-    .setMaster("local[*]")
-    .set("spark.cores.max", "4")
 
   lazy val sparkSession: SparkSession = SparkSession
     .builder()
