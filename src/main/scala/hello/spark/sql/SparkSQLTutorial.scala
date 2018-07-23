@@ -1,9 +1,9 @@
-package hello.spark.dataframe
+package hello.spark.sql
 
 import org.apache.spark.SparkFiles
 import org.apache.spark.sql.SparkSession
 
-object DataFrameTutorial {
+object SparkSQLTutorial {
   def run(sparkSession: SparkSession): Unit = {
     val dfTags = sparkSession
       .read
@@ -12,21 +12,26 @@ object DataFrameTutorial {
       .csv(SparkFiles.get("question_tags_10K.csv"))
       .toDF("id", "tag")
 
-    dfTags.show(10)
-    dfTags.filter("tag == 'php'").show(10)
-    println(s"Number of php tags = ${dfTags.filter("tag == 'php'").count()}")
+    dfTags.createOrReplaceTempView("so_tags")
+    sparkSession.catalog.listTables().show()
+    sparkSession.sql("SHOW tables").show()
 
-    dfTags
-      .groupBy("tag")
-      .count()
-      .filter("count > 5")
-      .orderBy("tag")
-      .show(10)
+    sparkSession
+      .sql("SELECT id, tag FROM so_tags LIMIT 10")
+      .show()
 
-    dfTags
-      .select("tag")
-      .distinct()
-      .show(10)
+    sparkSession
+      .sql(
+        """
+          |SELECT
+          |  COUNT(*) AS php_count
+          |FROM
+          |  so_tags
+          |WHERE
+          |  tag = 'php'
+        """.stripMargin
+      )
+      .show()
 
     val dfQuestionsCSV = sparkSession
       .read
@@ -35,8 +40,6 @@ object DataFrameTutorial {
       .option("dateFormat", "yyyy-MM-dd HH:mm:ss")
       .csv(SparkFiles.get("questions_10K.csv"))
       .toDF("id", "creation_date", "closed_date", "deletion_date", "score", "owner_userid", "answer_count")
-
-    dfQuestionsCSV.printSchema()
 
     val dfQuestions = dfQuestionsCSV.select(
       dfQuestionsCSV.col("id").cast("integer"),
@@ -48,15 +51,30 @@ object DataFrameTutorial {
       dfQuestionsCSV.col("answer_count").cast("integer")
     )
 
-    dfQuestions.printSchema()
-
     val dfQuestionsSubset = dfQuestions
       .filter("score > 400 AND score < 410")
       .toDF()
 
-    dfQuestionsSubset
-      .join(dfTags, dfTags("id") === dfQuestionsSubset("id"))
-      .select("owner_userid", "tag", "creation_date", "score")
+    dfQuestionsSubset.createOrReplaceTempView("so_questions")
+
+    sparkSession
+      .sql(
+        """
+          |SELECT t.*, q.*
+          |FROM so_questions q
+          |INNER JOIN so_tags t
+          |ON t.id = q.id
+        """.stripMargin
+      )
+      .show(10)
+
+    def prefixStackOverflow(s: String): String = s"so_$s"
+    sparkSession
+      .udf
+      .register("prefix_so", prefixStackOverflow _)
+
+    sparkSession
+      .sql("""SELECT id, prefix_so(tag) FROM so_tags""")
       .show(10)
   }
 }

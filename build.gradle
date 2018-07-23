@@ -46,4 +46,4 @@ dependencies {
 }
 
 // shadowJar task creates a jar in build/libs that can be executed with:
-// spark-submit --master local[1] --files ../../spark-warehouse/questions_10K.csv,../../spark-warehouse/question_tags_10K.csv hello-spark-gradle-1.0-SNAPSHOT-all.jar
+// spark-submit --master local[1] --files spark-warehouse/questions_10K.csv,spark-warehouse/question_tags_10K.csv build/libs/hello-spark-gradle-1.0-SNAPSHOT-all.jar
