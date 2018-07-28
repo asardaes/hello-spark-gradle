@@ -4,11 +4,13 @@ import hello.spark.dataframe.{DataFrameOperations, DataFrameStatistics, DataFram
 import hello.spark.sql.SparkSQLTutorial
 import hello.spark.utils.Context
 
-object Main extends App with Context {
-  sparkSession.sparkContext.setLogLevel("WARN")
-  DataFrameTutorial.run(sparkSession)
-  SparkSQLTutorial.run(sparkSession)
-  DataFrameStatistics.run(sparkSession)
-  DataFrameOperations.run(sparkSession)
-  sparkSession.stop()
+object Main extends Context {
+  def main (args: Array[String]) {
+    sparkSession.sparkContext.setLogLevel ("WARN")
+    DataFrameTutorial.run (sparkSession)
+    SparkSQLTutorial.run (sparkSession)
+    DataFrameStatistics.run (sparkSession)
+    DataFrameOperations.run (sparkSession)
+    sparkSession.stop ()
+  }
 }
