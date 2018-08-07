@@ -1,11 +1,11 @@
 buildscript {
     ext {
-        scala_version = '2.11.12'
+        scala_version = '2.11'
         spark_version = '2.2.2'
         spark_dependencies = [
-                "org.apache.spark:spark-core_2.11:${spark_version}",
-                "org.apache.spark:spark-sql_2.11:${spark_version}",
-                "org.apache.spark:spark-mllib_2.11:${spark_version}"
+                "org.apache.spark:spark-core_$scala_version:$spark_version",
+                "org.apache.spark:spark-sql_$scala_version:$spark_version",
+                "org.apache.spark:spark-mllib_$scala_version:$spark_version"
         ]
     }
     repositories {
@@ -37,12 +37,15 @@ dependencies {
     compileOnly(
             *spark_dependencies
     )
+    implementation (
+            "org.scala-lang:scala-library:$scala_version"
+    )
     // *implementation, so bundled into (test) jar
     //noinspection GroovyAssignabilityCheck
     testImplementation (
             "junit:junit:4.12",
-            "org.scalatest:scalatest_2.11:3.0.5",
-            // spark again, so that local tests can be executed from IntelliJ
+            "org.scalatest:scalatest_$scala_version:3.0.+",
+            // spark again so that local tests can be executed from IntelliJ
             *spark_dependencies
     )
 }
