@@ -35,10 +35,8 @@ dependencies {
     // excluded from shadowJar
     //noinspection GroovyAssignabilityCheck
     compileOnly(
+            "org.scala-lang:scala-library:$scala_version",
             *spark_dependencies
-    )
-    implementation (
-            "org.scala-lang:scala-library:$scala_version"
     )
     // *implementation, so bundled into (test) jar
     //noinspection GroovyAssignabilityCheck
